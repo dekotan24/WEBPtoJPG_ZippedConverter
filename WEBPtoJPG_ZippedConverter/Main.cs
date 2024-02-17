@@ -386,11 +386,5 @@ namespace WEBPtoJPG_ZippedConverter
 				e.Effect = DragDropEffects.None;
 			}
 		}
-
-		private void githubLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-		{
-			this.githubLinkLabel.LinkVisited = true;
-			System.Diagnostics.Process.Start("https://github.com/dekotan24/WEBPtoJPGZippedConverter");
-		}
 	}
 }

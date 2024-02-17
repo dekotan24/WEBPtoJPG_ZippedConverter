@@ -45,7 +45,6 @@
 			this.logText = new System.Windows.Forms.RichTextBox();
 			this.titleLabel = new System.Windows.Forms.Label();
 			this.versionLabel = new System.Windows.Forms.Label();
-			this.githubLinkLabel = new System.Windows.Forms.LinkLabel();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -184,7 +183,7 @@
 			// 
 			this.titleLabel.AutoSize = true;
 			this.titleLabel.Font = new System.Drawing.Font("Yu Gothic UI", 12F);
-			this.titleLabel.Location = new System.Drawing.Point(116, 6);
+			this.titleLabel.Location = new System.Drawing.Point(113, 6);
 			this.titleLabel.Name = "titleLabel";
 			this.titleLabel.Size = new System.Drawing.Size(323, 21);
 			this.titleLabel.TabIndex = 5;
@@ -199,17 +198,6 @@
 			this.versionLabel.TabIndex = 6;
 			this.versionLabel.Text = "Ver.x.x";
 			// 
-			// githubLinkLabel
-			// 
-			this.githubLinkLabel.AutoSize = true;
-			this.githubLinkLabel.Location = new System.Drawing.Point(506, 6);
-			this.githubLinkLabel.Name = "githubLinkLabel";
-			this.githubLinkLabel.Size = new System.Drawing.Size(45, 15);
-			this.githubLinkLabel.TabIndex = 7;
-			this.githubLinkLabel.TabStop = true;
-			this.githubLinkLabel.Text = "GitHub";
-			this.githubLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.githubLinkLabel_LinkClicked);
-			// 
 			// openFileDialog1
 			// 
 			this.openFileDialog1.FileName = "openFileDialog1";
@@ -220,7 +208,6 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(554, 457);
-			this.Controls.Add(this.githubLinkLabel);
 			this.Controls.Add(this.versionLabel);
 			this.Controls.Add(this.titleLabel);
 			this.Controls.Add(this.logText);
@@ -258,7 +245,6 @@
 		private Button executeButton;
 		private Label titleLabel;
 		private Label versionLabel;
-		private LinkLabel githubLinkLabel;
 		private OpenFileDialog openFileDialog1;
 		private FolderBrowserDialog folderBrowserDialog1;
 		private SaveFileDialog saveFileDialog1;
