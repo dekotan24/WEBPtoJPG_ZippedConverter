@@ -289,7 +289,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "Main";
-			this.Text = "WEPB to JPG Zipped Converter";
+			this.Text = "WEBP to JPG Zipped Converter";
 			this.Load += new System.EventHandler(this.Main_Load);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.AddItem_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.AddItem_DragEnter);
