@@ -138,7 +138,6 @@ namespace WEBPtoJPG_ZippedConverter
 		{
 			string baseFilePath = importPath;
 			string workDir = (workDirectory).EndsWith("\\") ? workDirectory.Trim() : workDirectory.Trim() + "\\";
-			string saveFilePath = exportPath;
 
 			// ワークディレクトリ内ファイルクリーン
 			addInfoMessage("ワークディレクトリ内ファイルクリーンを開始");
@@ -163,7 +162,7 @@ namespace WEBPtoJPG_ZippedConverter
 
 			// 再圧縮
 			addInfoMessage("ファイルの再圧縮を開始");
-			if (!compress(workDir + "convert", saveFilePath))
+			if (!compress(workDir + "convert", exportPath))
 			{
 				addInfoMessage("処理を中断しました。");
 				return;
@@ -191,8 +190,7 @@ namespace WEBPtoJPG_ZippedConverter
 					cleanWorkDir(workDir);
 				}
 			}
-			addInfoMessage("完了！\n保存先：" + saveFilePath);
-			MessageBox.Show("処理完了！\n保存先\n[" + saveFilePath + "]", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+			MessageBox.Show("処理完了！\n保存先\n[" + ((delFlg && renameFlg) ? importPath : exportPath) + "]", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 			return;
 		}
@@ -301,7 +299,7 @@ namespace WEBPtoJPG_ZippedConverter
 		public void addErrorMessage(string message, string path, string appendMessage = "")
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append("\n[ERROR] ").Append(message).Append(" [").Append(path).Append("] ").Append(appendMessage).Append(" (").Append(DateTime.Now).Append(")");
+			sb.Append("[ERROR] ").Append(message).Append(" [").Append(path).Append("] ").Append(appendMessage).Append(" (").Append(DateTime.Now).Append(")");
 			MessageBox.Show(sb.ToString(), AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
 			/*
 			message = sb.ToString();
