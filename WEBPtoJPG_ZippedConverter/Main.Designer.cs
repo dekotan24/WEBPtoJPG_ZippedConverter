@@ -48,8 +48,15 @@
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.label4 = new System.Windows.Forms.Label();
+			this.qualityText = new System.Windows.Forms.NumericUpDown();
+			this.renameCheck = new System.Windows.Forms.CheckBox();
+			this.oldFileDelCheck = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
+			this.groupBox3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.qualityText)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupBox1
@@ -72,7 +79,7 @@
 			this.workFolderBrowseText.Location = new System.Drawing.Point(494, 94);
 			this.workFolderBrowseText.Name = "workFolderBrowseText";
 			this.workFolderBrowseText.Size = new System.Drawing.Size(25, 23);
-			this.workFolderBrowseText.TabIndex = 5;
+			this.workFolderBrowseText.TabIndex = 4;
 			this.workFolderBrowseText.Text = "..";
 			this.workFolderBrowseText.UseVisualStyleBackColor = true;
 			this.workFolderBrowseText.Click += new System.EventHandler(this.workFolderBrowseText_Click);
@@ -82,7 +89,7 @@
 			this.workFolderPathText.Location = new System.Drawing.Point(6, 94);
 			this.workFolderPathText.Name = "workFolderPathText";
 			this.workFolderPathText.Size = new System.Drawing.Size(482, 23);
-			this.workFolderPathText.TabIndex = 4;
+			this.workFolderPathText.TabIndex = 3;
 			this.toolTip1.SetToolTip(this.workFolderPathText, "一時的に展開する際に使用する作業フォルダ");
 			// 
 			// label2
@@ -126,7 +133,7 @@
 			this.exportZipFilePathText.Location = new System.Drawing.Point(6, 37);
 			this.exportZipFilePathText.Name = "exportZipFilePathText";
 			this.exportZipFilePathText.Size = new System.Drawing.Size(482, 23);
-			this.exportZipFilePathText.TabIndex = 4;
+			this.exportZipFilePathText.TabIndex = 5;
 			this.toolTip1.SetToolTip(this.exportZipFilePathText, "変換元ファイルが存在するZIPファイルを入力");
 			// 
 			// groupBox2
@@ -146,7 +153,7 @@
 			this.exportZipFileBrowseButton.Location = new System.Drawing.Point(494, 37);
 			this.exportZipFileBrowseButton.Name = "exportZipFileBrowseButton";
 			this.exportZipFileBrowseButton.Size = new System.Drawing.Size(25, 23);
-			this.exportZipFileBrowseButton.TabIndex = 5;
+			this.exportZipFileBrowseButton.TabIndex = 6;
 			this.exportZipFileBrowseButton.Text = "..";
 			this.exportZipFileBrowseButton.UseVisualStyleBackColor = true;
 			this.exportZipFileBrowseButton.Click += new System.EventHandler(this.exportZipFileBrowseButton_Click);
@@ -163,20 +170,20 @@
 			// executeButton
 			// 
 			this.executeButton.Font = new System.Drawing.Font("Yu Gothic UI", 18F, System.Drawing.FontStyle.Bold);
-			this.executeButton.Location = new System.Drawing.Point(12, 283);
+			this.executeButton.Location = new System.Drawing.Point(12, 332);
 			this.executeButton.Name = "executeButton";
 			this.executeButton.Size = new System.Drawing.Size(530, 68);
-			this.executeButton.TabIndex = 2;
+			this.executeButton.TabIndex = 10;
 			this.executeButton.Text = "変換！";
 			this.executeButton.UseVisualStyleBackColor = true;
 			this.executeButton.Click += new System.EventHandler(this.executeButton_Click);
 			// 
 			// logText
 			// 
-			this.logText.Location = new System.Drawing.Point(12, 375);
+			this.logText.Location = new System.Drawing.Point(12, 406);
 			this.logText.Name = "logText";
 			this.logText.Size = new System.Drawing.Size(530, 71);
-			this.logText.TabIndex = 4;
+			this.logText.TabIndex = 11;
 			this.logText.Text = "";
 			// 
 			// titleLabel
@@ -202,20 +209,87 @@
 			// 
 			this.openFileDialog1.FileName = "openFileDialog1";
 			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.label4);
+			this.groupBox3.Controls.Add(this.qualityText);
+			this.groupBox3.Controls.Add(this.renameCheck);
+			this.groupBox3.Controls.Add(this.oldFileDelCheck);
+			this.groupBox3.Location = new System.Drawing.Point(12, 272);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(530, 54);
+			this.groupBox3.TabIndex = 7;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "オプション";
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(424, 23);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(49, 15);
+			this.label4.TabIndex = 3;
+			this.label4.Text = "画質(%)";
+			// 
+			// qualityText
+			// 
+			this.qualityText.Location = new System.Drawing.Point(479, 21);
+			this.qualityText.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.qualityText.Name = "qualityText";
+			this.qualityText.Size = new System.Drawing.Size(45, 23);
+			this.qualityText.TabIndex = 9;
+			this.qualityText.Value = new decimal(new int[] {
+            85,
+            0,
+            0,
+            0});
+			// 
+			// renameCheck
+			// 
+			this.renameCheck.AutoSize = true;
+			this.renameCheck.Checked = true;
+			this.renameCheck.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.renameCheck.Location = new System.Drawing.Point(186, 22);
+			this.renameCheck.Name = "renameCheck";
+			this.renameCheck.Size = new System.Drawing.Size(197, 19);
+			this.renameCheck.TabIndex = 8;
+			this.renameCheck.Text = "変換後に変換元ファイル名にリネーム";
+			this.renameCheck.UseVisualStyleBackColor = true;
+			// 
+			// oldFileDelCheck
+			// 
+			this.oldFileDelCheck.AutoSize = true;
+			this.oldFileDelCheck.Checked = true;
+			this.oldFileDelCheck.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.oldFileDelCheck.Location = new System.Drawing.Point(6, 22);
+			this.oldFileDelCheck.Name = "oldFileDelCheck";
+			this.oldFileDelCheck.Size = new System.Drawing.Size(174, 19);
+			this.oldFileDelCheck.TabIndex = 7;
+			this.oldFileDelCheck.Text = "変換後に変換元ファイルを削除";
+			this.oldFileDelCheck.UseVisualStyleBackColor = true;
+			this.oldFileDelCheck.CheckedChanged += new System.EventHandler(this.oldFileDelCheck_CheckedChanged);
+			// 
 			// Main
 			// 
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(554, 457);
+			this.ClientSize = new System.Drawing.Size(554, 489);
+			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.versionLabel);
 			this.Controls.Add(this.titleLabel);
 			this.Controls.Add(this.logText);
 			this.Controls.Add(this.executeButton);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.MaximizeBox = false;
 			this.Name = "Main";
-			this.Text = "Form1";
+			this.Text = "WEPB to JPG Zipped Converter";
 			this.Load += new System.EventHandler(this.Main_Load);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.AddItem_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.AddItem_DragEnter);
@@ -223,6 +297,9 @@
 			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
+			this.groupBox3.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.qualityText)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -249,5 +326,10 @@
 		private FolderBrowserDialog folderBrowserDialog1;
 		private SaveFileDialog saveFileDialog1;
 		public RichTextBox logText;
+		private GroupBox groupBox3;
+		private Label label4;
+		private NumericUpDown qualityText;
+		private CheckBox renameCheck;
+		private CheckBox oldFileDelCheck;
 	}
 }

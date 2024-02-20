@@ -1,6 +1,7 @@
 using System.Drawing.Imaging;
 using System.IO.Compression;
 using System.Text;
+using ImageProcessor;
 using ImageProcessor.Plugins.WebP.Imaging.Formats;
 
 namespace WEBPtoJPG_ZippedConverter
@@ -8,6 +9,7 @@ namespace WEBPtoJPG_ZippedConverter
 	public partial class Main : Form
 	{
 		private readonly string AppName = "WebpToJpg ZippedConverter";
+		private readonly string AppVer = "1.1.0";
 		private string randomKey = string.Empty;
 		public string message = string.Empty;
 
@@ -19,8 +21,8 @@ namespace WEBPtoJPG_ZippedConverter
 		private void Main_Load(object sender, EventArgs e)
 		{
 			logText.Clear();
-			logText.AppendText(AppName + " Ver." + ProductVersion);
-			versionLabel.Text = "Ver." + ProductVersion;
+			logText.AppendText(AppName + " Ver." + AppVer);
+			versionLabel.Text = "Ver." + AppVer;
 
 			// ランダムワークキー作成
 			var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".EnumerateRunes().ToArray();
@@ -115,21 +117,24 @@ namespace WEBPtoJPG_ZippedConverter
 			string importPath = importZipFilePathText.Text.Trim();
 			string workDir = workFolderPathText.Text.Trim();
 			string exportPath = exportZipFilePathText.Text.Trim();
+			bool delAfterConvertFlg = oldFileDelCheck.Checked;
+			bool renameFlg = renameCheck.Checked;
+			int imgQuality = (int)qualityText.Value;
 
 			logText.Clear();
-			logText.AppendText(AppName + " Ver." + ProductVersion);
+			logText.AppendText(AppName + " Ver." + AppVer);
 			addInfoMessage("処理開始！\n処理は別スレッドで実行されています。ダイアログが表示されるまでしばらくお待ち下さい。");
 
 			Thread t = new Thread(new ThreadStart(() =>
 			{
-				convert(importPath, workDir, exportPath);
+				convert(importPath, workDir, exportPath, delAfterConvertFlg, renameFlg, imgQuality);
 			}));
 			t.Start();
 
 			importZipFilePathText.Text = exportZipFilePathText.Text = string.Empty;
 		}
 
-		private void convert(string importPath, string workDirectory, string exportPath)
+		private void convert(string importPath, string workDirectory, string exportPath, bool delFlg, bool renameFlg, int quality)
 		{
 			string baseFilePath = importPath;
 			string workDir = (workDirectory).EndsWith("\\") ? workDirectory.Trim() : workDirectory.Trim() + "\\";
@@ -150,7 +155,7 @@ namespace WEBPtoJPG_ZippedConverter
 
 			// ファイル変換
 			addInfoMessage("ファイルの変換を開始");
-			if (!convertToJpg(workDir))
+			if (!convertToJpg(workDir, quality))
 			{
 				addInfoMessage("処理を中断しました。");
 				return;
@@ -169,6 +174,23 @@ namespace WEBPtoJPG_ZippedConverter
 			cleanWorkDir(workDir);
 
 			// 完了処理
+			addInfoMessage("最終処理中");
+			if (delFlg)
+			{
+				try
+				{
+					File.Delete(importPath);
+					if (renameFlg)
+					{
+						File.Move(exportPath, importPath);
+					}
+				}
+				catch (Exception ex)
+				{
+					addErrorMessage(ex.Message, importPath);
+					cleanWorkDir(workDir);
+				}
+			}
 			addInfoMessage("完了！\n保存先：" + saveFilePath);
 			MessageBox.Show("処理完了！\n保存先\n[" + saveFilePath + "]", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -214,7 +236,7 @@ namespace WEBPtoJPG_ZippedConverter
 			return result;
 		}
 
-		private bool convertToJpg(string workDir)
+		private bool convertToJpg(string workDir, int quality)
 		{
 			bool result = true;
 			if (File.Exists(workDir + "*.webp"))
@@ -248,7 +270,7 @@ namespace WEBPtoJPG_ZippedConverter
 				try
 				{
 					// 変換
-					Save(file, outputPath, ImageFormat.Jpeg);
+					save(file, outputPath, ImageFormat.Jpeg, quality);
 				}
 				catch (Exception ex)
 				{
@@ -337,15 +359,18 @@ namespace WEBPtoJPG_ZippedConverter
 			return;
 		}
 
-		private void Save(string inputFile, string outputFile, ImageFormat format)
+		private void save(string inputFile, string outputFile, ImageFormat format, int quality)
 		{
 			var wf = new WebPFormat();
-			var stream = new FileStream(inputFile, FileMode.Open, FileAccess.Read);
+			wf.Quality = quality;
+			Stream stream = new FileStream(inputFile, FileMode.Open, FileAccess.Read);
 			var image = (Bitmap)wf.Load(stream);
-			image.Save(outputFile, format);
 			stream.Close();
+			ImageFactory imgfactory = new ImageFactory();
+			imgfactory.Load(image);
+			imgfactory.Format(wf);
+			imgfactory.Save(outputFile);
 		}
-
 
 		private void autoComplete(string basePath)
 		{
@@ -384,6 +409,18 @@ namespace WEBPtoJPG_ZippedConverter
 			else
 			{
 				e.Effect = DragDropEffects.None;
+			}
+		}
+
+		private void oldFileDelCheck_CheckedChanged(object sender, EventArgs e)
+		{
+			if (oldFileDelCheck.Checked)
+			{
+				renameCheck.Enabled = true;
+			}
+			else
+			{
+				renameCheck.Enabled = false;
 			}
 		}
 	}

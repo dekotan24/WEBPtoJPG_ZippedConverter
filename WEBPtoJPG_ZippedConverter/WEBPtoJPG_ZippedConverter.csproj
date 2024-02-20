@@ -7,6 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Description>ZIPアーカイブ内のwebpファイルをjpgに変換し、ZIPアーカイブに再圧縮します。</Description>
+    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <NeutralLanguage>ja-JP</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
