@@ -8,8 +8,8 @@ namespace WEBPtoJPG_ZippedConverter
 {
 	public partial class Main : Form
 	{
-		private readonly string AppName = "WebpToJpg ZippedConverter";
-		private readonly string AppVer = "1.1.0";
+		public static readonly string AppName = "WebpToJpg ZippedConverter";
+		public static readonly string AppVer = "1.2.0";
 		private string randomKey = string.Empty;
 		public string message = string.Empty;
 
@@ -24,17 +24,11 @@ namespace WEBPtoJPG_ZippedConverter
 			logText.AppendText(AppName + " Ver." + AppVer);
 			versionLabel.Text = "Ver." + AppVer;
 
-			// ランダムワークキー作成
-			var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".EnumerateRunes().ToArray();
-			var builder = new System.Text.StringBuilder();
-			Random r = new Random();
-			for (int i = 0; i < 5; i++)
-			{
-				builder.Append(chars[r.Next(chars.Length)]);
-			}
-			randomKey = builder.ToString();
+			encodingList.SelectedIndex = 0;
 
-			workFolderPathText.Text = Directory.GetCurrentDirectory() + "\\" + randomKey + "\\";
+			generateNewRandomKey();
+
+			workFolderPathText.Text = Directory.GetCurrentDirectory() + "\\";
 		}
 
 		private void importZipFileBrowseButton_Click(object sender, EventArgs e)
@@ -51,36 +45,66 @@ namespace WEBPtoJPG_ZippedConverter
 			return;
 		}
 
+		private void importZipDirectoryBrowseButton_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1 = new FolderBrowserDialog();
+			folderBrowserDialog1.Description = "変換元ZIPファイルが含まれるフォルダを選択";
+			if (folderBrowserDialog1.ShowDialog() != DialogResult.Cancel)
+			{
+				importZipDirectoryPathText.Text = folderBrowserDialog1.SelectedPath;
+				autoComplete(folderBrowserDialog1.SelectedPath);
+			}
+			return;
+		}
+
 		private void workFolderBrowseText_Click(object sender, EventArgs e)
 		{
 			folderBrowserDialog1 = new FolderBrowserDialog();
 			folderBrowserDialog1.Description = "作業フォルダを選択";
 			if (folderBrowserDialog1.ShowDialog() != DialogResult.Cancel)
 			{
-				workFolderPathText.Text = ((folderBrowserDialog1.SelectedPath).EndsWith("\\") ? folderBrowserDialog1.SelectedPath : folderBrowserDialog1.SelectedPath + "\\") + randomKey + "\\";
+				workFolderPathText.Text = folderBrowserDialog1.SelectedPath;
 			}
 			return;
 		}
 
 		private void exportZipFileBrowseButton_Click(object sender, EventArgs e)
 		{
-			saveFileDialog1 = new SaveFileDialog();
-			saveFileDialog1.Title = "変換後ZIPファイル保存先を選択";
-			saveFileDialog1.Filter = "ZIPファイル(*.zip)|*.zip";
-			saveFileDialog1.FileName = "";
-			if (saveFileDialog1.ShowDialog() != DialogResult.Cancel)
+			if (importZipFileRadio.Checked)
 			{
-				exportZipFilePathText.Text = saveFileDialog1.FileName;
+				saveFileDialog1 = new SaveFileDialog();
+				saveFileDialog1.Title = "変換後ZIPファイル保存先を選択";
+				saveFileDialog1.Filter = "ZIPファイル(*.zip)|*.zip";
+				saveFileDialog1.FileName = "";
+				if (saveFileDialog1.ShowDialog() != DialogResult.Cancel)
+				{
+					exportZipPathText.Text = saveFileDialog1.FileName;
+				}
+			}
+			else
+			{
+				folderBrowserDialog1 = new FolderBrowserDialog();
+				folderBrowserDialog1.Description = "変換後のZIPファイルを保存するフォルダを選択";
+				if (folderBrowserDialog1.ShowDialog() != DialogResult.Cancel)
+				{
+					workFolderPathText.Text = folderBrowserDialog1.SelectedPath;
+				}
 			}
 			return;
 		}
 
 		private void executeButton_Click(object sender, EventArgs e)
 		{
-			if (importZipFilePathText.Text.Trim().Length == 0)
+			if (importZipFilePathText.Text.Trim().Length == 0 && importZipFileRadio.Checked)
 			{
 				MessageBox.Show("参照元ZIPファイルは必須です。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				importZipFilePathText.Focus();
+				return;
+			}
+			if (importZipDirectoryPathText.Text.Trim().Length == 0 && importZipDirectoryRadio.Checked)
+			{
+				MessageBox.Show("参照元ZIPディレクトリは必須です。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				importZipDirectoryPathText.Focus();
 				return;
 			}
 			if (workFolderPathText.Text.Trim().Length == 0)
@@ -89,231 +113,53 @@ namespace WEBPtoJPG_ZippedConverter
 				workFolderPathText.Focus();
 				return;
 			}
-			if (exportZipFilePathText.Text.Trim().Length == 0)
+			if (exportZipPathText.Text.Trim().Length == 0)
 			{
 				MessageBox.Show("変換後ZIPファイルは必須です。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				exportZipFilePathText.Focus();
+				exportZipPathText.Focus();
 				return;
 			}
-			if (File.Exists(exportZipFilePathText.Text.Trim()))
+			if (File.Exists(exportZipPathText.Text.Trim()))
 			{
 				MessageBox.Show("変換後ZIPファイルパスは既に存在しています。\n存在しないファイル名を指定してください。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				exportZipFilePathText.Focus();
+				exportZipPathText.Focus();
 				return;
 			}
-			if (!(Path.GetExtension(importZipFilePathText.Text.Trim()).ToUpper() == ".ZIP"))
+			if (!(Path.GetExtension(importZipFilePathText.Text.Trim()).ToUpper() == ".ZIP") && importZipFileRadio.Checked)
 			{
 				MessageBox.Show("参照元ZIPファイルパスはZIPファイルではありません。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				importZipFilePathText.Focus();
 				return;
 			}
-			if (!(Path.GetExtension(exportZipFilePathText.Text.Trim()).ToUpper() == ".ZIP"))
+			if (!(Path.GetExtension(exportZipPathText.Text.Trim()).ToUpper() == ".ZIP") && importZipFileRadio.Checked)
 			{
 				MessageBox.Show("変換後ZIPファイルパスはZIPファイルではありません。", AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				exportZipFilePathText.Focus();
+				exportZipPathText.Focus();
 				return;
 			}
 
-			string importPath = importZipFilePathText.Text.Trim();
-			string workDir = workFolderPathText.Text.Trim();
-			string exportPath = exportZipFilePathText.Text.Trim();
+			string workKey = randomKey;
+			bool fileMode = importZipFileRadio.Checked;
+			string importPath = fileMode ? importZipFilePathText.Text.Trim() : importZipDirectoryPathText.Text.Trim();
+			string workDir = Path.Combine(workFolderPathText.Text.Trim(), workKey);
+			string exportPath = exportZipPathText.Text.Trim();
 			bool delAfterConvertFlg = oldFileDelCheck.Checked;
 			bool renameFlg = renameCheck.Checked;
 			int imgQuality = (int)qualityText.Value;
 
 			logText.Clear();
 			logText.AppendText(AppName + " Ver." + AppVer);
-			addInfoMessage("処理開始！\n処理は別スレッドで実行されています。ダイアログが表示されるまでしばらくお待ち下さい。");
+			addInfoMessage("処理開始！処理は別スレッドで実行されています。ダイアログが表示されるまでしばらくお待ち下さい。\n対象ファイル：" + importPath + "\nワークキー：" + workKey);
 
 			Thread t = new Thread(new ThreadStart(() =>
 			{
-				convert(importPath, workDir, exportPath, delAfterConvertFlg, renameFlg, imgQuality);
+				Exec execForm = new Exec(importPath, workDir, exportPath, delAfterConvertFlg, renameFlg, imgQuality, workKey, fileMode);
 			}));
 			t.Start();
 
-			importZipFilePathText.Text = exportZipFilePathText.Text = string.Empty;
-		}
+			generateNewRandomKey();
 
-		private void convert(string importPath, string workDirectory, string exportPath, bool delFlg, bool renameFlg, int quality)
-		{
-			string baseFilePath = importPath;
-			string workDir = (workDirectory).EndsWith("\\") ? workDirectory.Trim() : workDirectory.Trim() + "\\";
-
-			// ワークディレクトリ内ファイルクリーン
-			addInfoMessage("ワークディレクトリ内ファイルクリーンを開始");
-			cleanWorkDir(workDir);
-
-			// ZIPファイル抽出
-			addInfoMessage("ZIPファイルの抽出を開始");
-
-			if (!UnZip(baseFilePath, workDir))
-			{
-				addInfoMessage("処理を中断しました。");
-				return;
-			}
-
-			// ファイル変換
-			addInfoMessage("ファイルの変換を開始");
-			if (!convertToJpg(workDir, quality))
-			{
-				addInfoMessage("処理を中断しました。");
-				return;
-			}
-
-			// 再圧縮
-			addInfoMessage("ファイルの再圧縮を開始");
-			if (!compress(workDir + "convert", exportPath))
-			{
-				addInfoMessage("処理を中断しました。");
-				return;
-			}
-
-			// ワークディレクトリ内ファイルクリーン
-			addInfoMessage("ワークディレクトリ内ファイルクリーンを開始");
-			cleanWorkDir(workDir);
-
-			// 完了処理
-			addInfoMessage("最終処理中");
-			if (delFlg)
-			{
-				try
-				{
-					File.Delete(importPath);
-					if (renameFlg)
-					{
-						File.Move(exportPath, importPath);
-					}
-				}
-				catch (Exception ex)
-				{
-					addErrorMessage(ex.Message, importPath);
-					cleanWorkDir(workDir);
-				}
-			}
-			MessageBox.Show("処理完了！\n保存先\n[" + ((delFlg && renameFlg) ? importPath : exportPath) + "]", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-			return;
-		}
-
-		private bool UnZip(string unZipFilePath, string workDir)
-		{
-			bool result = true;
-
-			// 展開元ファイル存在チェック
-			if (!File.Exists(unZipFilePath))
-			{
-				addErrorMessage("ファイルが見つかりません", unZipFilePath);
-				return false;
-			}
-
-			// 作業ディレクトリ存在チェック
-			if (!Directory.Exists(workDir))
-			{
-				// 存在しない場合、フォルダ作成
-				try
-				{
-					Directory.CreateDirectory(workDir);
-				}
-				catch (Exception ex)
-				{
-					addErrorMessage(ex.Message, workDir);
-					return false;
-				}
-			}
-
-			try
-			{
-				ZipFile.ExtractToDirectory(unZipFilePath, workDir);
-			}
-			catch (Exception ex)
-			{
-				addErrorMessage(ex.Message, unZipFilePath, workDir);
-				cleanWorkDir(workDir);
-				return false;
-			}
-			return result;
-		}
-
-		private bool convertToJpg(string workDir, int quality)
-		{
-			bool result = true;
-			if (File.Exists(workDir + "*.webp"))
-			{
-				addErrorMessage("webpファイルがありません", workDir);
-				cleanWorkDir(workDir);
-				return false;
-			}
-
-			// コンバートフォルダ作成
-			if (!Directory.Exists(workDir + "convert"))
-			{
-				try
-				{
-					Directory.CreateDirectory(workDir + "convert");
-				}
-				catch (Exception ex)
-				{
-					addErrorMessage(ex.Message, workDir + "convert");
-					cleanWorkDir(workDir);
-					return false;
-				}
-			}
-
-			// 変換処理
-			foreach (string file in Directory.GetFiles(workDir, "*.webp", SearchOption.TopDirectoryOnly))
-			{
-				string fileName = Path.GetFileNameWithoutExtension(file);
-				string outputPath = workDir + "convert\\" + fileName + ".jpg";
-
-				try
-				{
-					// 変換
-					save(file, outputPath, ImageFormat.Jpeg, quality);
-				}
-				catch (Exception ex)
-				{
-					addErrorMessage(ex.Message, file);
-					cleanWorkDir(workDir);
-					return false;
-				}
-			}
-			return result;
-		}
-
-		private bool compress(string workDir, string targetPath)
-		{
-			bool result = true;
-			try
-			{
-				ZipFile.CreateFromDirectory(workDir, targetPath);
-			}
-			catch (Exception ex)
-			{
-				addErrorMessage(ex.Message, workDir, targetPath);
-				cleanWorkDir(workDir);
-				return false;
-			}
-			return result;
-		}
-
-		public void addErrorMessage(string message, string path, string appendMessage = "")
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("[ERROR] ").Append(message).Append(" [").Append(path).Append("] ").Append(appendMessage).Append(" (").Append(DateTime.Now).Append(")");
-			MessageBox.Show(sb.ToString(), AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-			/*
-			message = sb.ToString();
-
-			if (this.InvokeRequired)
-			{
-				this.Invoke(new Action(this.writeLog));
-			}
-			else
-			{
-				logText.AppendText(message);
-			}
-			*/
-			return;
+			importZipFilePathText.Text = exportZipPathText.Text = importZipDirectoryPathText.Text = string.Empty;
 		}
 
 		public void addInfoMessage(string message)
@@ -333,47 +179,26 @@ namespace WEBPtoJPG_ZippedConverter
 			return;
 		}
 
-		private bool cleanWorkDir(string workDir)
-		{
-			bool result = true;
-			try
-			{
-				if (Directory.Exists(workDir))
-				{
-					Directory.Delete(workDir, true);
-				}
-			}
-			catch (Exception ex)
-			{
-				addErrorMessage(ex.Message, workDir);
-				return false;
-			}
-			return result;
-		}
-
 		private void writeLog()
 		{
 			logText.AppendText(message);
 			return;
 		}
 
-		private void save(string inputFile, string outputFile, ImageFormat format, int quality)
-		{
-			var wf = new WebPFormat();
-			wf.Quality = quality;
-			Stream stream = new FileStream(inputFile, FileMode.Open, FileAccess.Read);
-			var image = (Bitmap)wf.Load(stream);
-			stream.Close();
-			ImageFactory imgfactory = new ImageFactory();
-			imgfactory.Load(image);
-			imgfactory.Format(wf);
-			imgfactory.Save(outputFile);
-		}
-
 		private void autoComplete(string basePath)
 		{
-			string fullPath = ((Path.GetDirectoryName(basePath)).EndsWith("\\") ? Path.GetDirectoryName(basePath) : Path.GetDirectoryName(basePath) + "\\") + Path.GetFileNameWithoutExtension(basePath) + "_convert.zip";
-			exportZipFilePathText.Text = fullPath;
+			string fullPath = string.Empty;
+			if (!Directory.Exists(basePath))
+			{
+				// ファイルの場合
+				fullPath = Path.Combine(Path.GetDirectoryName(basePath), Path.GetFileNameWithoutExtension(basePath) + "_convert.zip");
+			}
+			else
+			{
+				// フォルダの場合
+				fullPath = Path.Combine(Path.GetDirectoryName(basePath), "convert");
+			}
+			exportZipPathText.Text = fullPath;
 		}
 
 		private void AddItem_DragDrop(object sender, DragEventArgs e)
@@ -384,7 +209,22 @@ namespace WEBPtoJPG_ZippedConverter
 			// GetDataにより取得したString型の配列から要素を取り出す。
 			var targetFile = dropTarget[0];
 
-			importZipFilePathText.Text = targetFile;
+			if (File.Exists(targetFile))
+			{
+				importZipFilePathText.Text = targetFile;
+				importZipDirectoryPathText.Text = string.Empty;
+				importZipFileRadio.Checked = true;
+			}
+			else if (Directory.Exists(targetFile))
+			{
+				importZipFilePathText.Text = string.Empty;
+				importZipDirectoryPathText.Text = targetFile;
+				importZipDirectoryRadio.Checked = true;
+			}
+			else
+			{
+				return;
+			}
 			autoComplete(targetFile);
 		}
 
@@ -415,11 +255,68 @@ namespace WEBPtoJPG_ZippedConverter
 			if (oldFileDelCheck.Checked)
 			{
 				renameCheck.Enabled = true;
+				if (renameCheck.Checked)
+				{
+					groupBox2.Enabled = false;
+				}
+				else
+				{
+					groupBox2.Enabled = true;
+				}
 			}
 			else
 			{
 				renameCheck.Enabled = false;
+				groupBox2.Enabled = true;
 			}
+		}
+
+		private void generateNewRandomKey()
+		{
+			// ランダムワークキー作成
+			var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".EnumerateRunes().ToArray();
+			var builder = new System.Text.StringBuilder();
+			Random r = new Random();
+			for (int i = 0; i < 5; i++)
+			{
+				builder.Append(chars[r.Next(chars.Length)]);
+			}
+			randomKey = builder.ToString();
+		}
+
+		private void importZipFileRadio_CheckedChanged(object sender, EventArgs e)
+		{
+			importTypeRadioChanged(true);
+		}
+
+		private void importZipDirectoryRadio_CheckedChanged(object sender, EventArgs e)
+		{
+			importTypeRadioChanged(false);
+		}
+
+		private void importTypeRadioChanged(bool fileMode)
+		{
+			importZipFilePathText.Enabled = fileMode;
+			importZipFileBrowseButton.Enabled = fileMode;
+			importZipDirectoryPathText.Enabled = !fileMode;
+			importZipDirectoryBrowseButton.Enabled = !fileMode;
+		}
+
+		private void renameCheck_CheckedChanged(object sender, EventArgs e)
+		{
+			if (renameCheck.Checked)
+			{
+				groupBox2.Enabled = false;
+			}
+			else
+			{
+				groupBox2.Enabled = true;
+			}
+		}
+
+		private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			MessageBox.Show("【注意！】\n・本ツールを使用すると、ZIPファイル内のディレクトリ構造が壊れます。\n（全てのファイルがルートパスに圧縮されます）\n\n・上記の仕様上、同じ名前のファイルが被ると予期せぬ不具合が発生する可能性が高いです。\n\n・文字コードはShift-JISのみ対応しています。\nエンコードが違うと、解凍時にエラーになる場合があります。\nShift-JISで再圧縮してください。\n\nいかなる損害・損失なども一切の責任を負いません。\n自己責任でご利用ください。", "リンクに見せかけてダイアログ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 	}
 }
